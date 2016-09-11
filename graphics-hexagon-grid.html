@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>  Graphics: Hexagon Grid
+ | Thoughts of a software developer journeyman</title>
+
+    <meta name="author" content=""/>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css"/>
+    <link rel="stylesheet" href="/theme/css/jquery.mglass.css"/>
+    <link rel="stylesheet" href="/theme/css/pygment-solarized-dark.css"/>
+    <link rel="stylesheet" href="/theme/css/style.css"/>
+
+    <!-- Fonts -->
+    <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
+    <link href='//fonts.googleapis.com/css?family=Istok+Web' rel='stylesheet' type='text/css'/>
+    <link href='//fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'/>
+
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Feeds -->
+
+
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <div class="page-header">
+        <h1><a href="">Thoughts of a software developer journeyman</a> <small></small></h1>
+      </div>
+
+      <nav class="navbar navbar-default">
+
+        <!-- Hamburger menu for mobile -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#plumage-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <i class="fa fa-ellipsis-v fa-lg"></i>
+          </button>
+          <a class="navbar-brand" href="" title="">Thoughts of a software developer journeyman</a>
+        </div>
+
+        <!-- Menus and search forms -->
+        <div class="collapse navbar-collapse" id="plumage-navbar-collapse-1">
+
+          <ul class="nav navbar-nav">
+<li >
+                  <a href="/pages/about-me.html">About me</a>
+                </li>
+          </ul>
+
+
+
+        </div>
+
+      </nav>
+
+    </div>
+
+
+    <div class="container">
+
+      <section>
+
+        <div class="row">
+          <div class=" col-md-9  ">
+  <h1>
+    <a href="/graphics-hexagon-grid.html" rel="bookmark" title="Permalink to Graphics: Hexagon Grid">Graphics: Hexagon Grid</a>
+  </h1>
+          </div>
+        </div>
+
+        <div class="row">
+
+
+          <div class=" col-md-9 " id="content" role="main">
+  
+
+  <div>
+    </head><body><p>I have been learning about graphics. A language of choice would probably be OpenGL/WebGL but this
+post would be in Java. Specifically, I would be using the <a href="https://docs.oracle.com/javase/7/docs/api/java/awt/package-summary.html">java.awt</a> package. Most board games (chess, checkers ) use some sort of
+grid based on some shape( squares, rectangles, hexagons are the most popular) for a playing surface. </p>
+<p>Today, I will be doing a hexagon grid. Hexagons can be either in a flat or pointy configuration. </p>
+<p><img alt="Pointy vs Flat Orientation" src="/images/Point_flat_orientation.gif"/></p>
+<p>Rembering geometry <code>(SOHCAHTOH)</code>, the number of angles in a polygon <code>(n -2) * 180</code>  and some properties of equilateral 
+triangles, we come up with this annotation:</p>
+<p><img alt="A annotated Pentagon" src="/images/Pentagon_annotated.jpg"/></p>
+<p>There are five vertices(I start from 0, because I am too used to <code>array notation</code>):</p>
+<blockquote>
+<p><span class="math">\(vert0 = ( x - \frac{r}{2}, y - \frac{h}{2})\)</span></p>
+<p><span class="math">\(vert1 = ( x + \frac{r}{2}, y - \frac{h}{2})\)</span></p>
+<p><span class="math">\(vert2 = ( x + r, y)\)</span></p>
+<p><span class="math">\(vert3 = ( x + \frac{r}{2}, y + \frac{h}{2})\)</span></p>
+<p><span class="math">\(vert4 = ( x - \frac{r}{2}, y + \frac{h}{2})\)</span></p>
+<p><span class="math">\(vert5 = ( x - r, y)\)</span></p>
+</blockquote>
+<p>We also need to get measurements for drawing rows and columns:</p>
+<p><img alt="Row measurements" src="/images/Row_annotated.jpg"/></p>
+<p>Other vertices:</p>
+<blockquote>
+<p><span class="math">\(vert6 = ( x + 2r, y)\)</span></p>
+<p><span class="math">\(vert7 = ( x + \frac{5r}{2}, y - \frac{h}{2})\)</span></p>
+<p><span class="math">\(vert8 = ( x + \frac{7r}{2}, y - \frac{h}{2})\)</span></p>
+<p><span class="math">\(vert9 = ( x + 4r, y)\)</span></p>
+<p><span class="math">\(vert10 = ( x - r, y + h)\)</span></p>
+</blockquote>
+<p><img alt="Column measurements" src="{filename}/../images/Column_annotated.jpg"/></p>
+<p>The java code is shown below:</p>
+<div class="gist">
+    <script src='https://gist.github.com/d65954e146db5738b7eb08953360f2e4.js'></script>
+    <noscript>
+        <pre><code>/**
+* @license: 
+* The MIT License (MIT)
+*
+* Copyright (c) 2016 David Okusanya
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*
+* 
+* @brief: Drawing a sequence of hexagons 
+*
+*/
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+class HexagonGrid extends Frame{
+
+	private int margin;
+
+	HexagonGrid(int margin){
+		super("HexagonGrid - Flat Orientation");
+		this.margin = margin;
+		addWindowListener(new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				System.exit(0);
+			}
+		});
+		
+		setSize(400, 400);
+		HexagonRect hexa = new HexagonRect(margin);
+		add("Center", hexa);
+		show();	
+	}
+
+	class HexagonRect extends Canvas{
+		
+		private int margin, mousePointX, mousePointY, height;
+
+		private int vertex0X, vertex0Y, temp_vertex0Y,  
+					vertex1X, vertex1Y, temp_vertex1Y, 
+					vertex2X, vertex2Y, temp_vertex2Y,
+					vertex3X, vertex3Y, temp_vertex3Y, 
+					vertex4X, vertex4Y, temp_vertex4Y, 
+					vertex5X, vertex5Y, temp_vertex5Y;
+
+
+		/**
+		 *  This is the rectangle that would contain the grid
+		 */
+		HexagonRect(int margin){
+			this.margin = margin;
+
+			addMouseListener(new MouseAdapter(){
+				public void mouseClicked(MouseEvent mt){
+					mousePointX = mt.getX();
+					mousePointY = mt.getY();
+					repaint();		// To facilitate a redrawing of the points
+				}
+			});
+		}
+
+		/**
+		 *  Return the radius of the hexagon from the point of the mouse click
+		 * @return radius An integer value
+		 */
+		public int getRadius(){
+			if (mousePointX <= margin){
+				mousePointX += margin;
+			}
+			if (mousePointY <= margin){
+				mousePointY += margin; 
+			}
+			int radiusX = mousePointX - margin;
+			int radiusY = mousePointY - margin;
+			int radius = (int) Math.sqrt((double)(radiusX * radiusX + radiusY * radiusY));
+			return radius;
+		}
+
+		/**
+		 * Calculate all the vertices of the first pentagon in the grid
+		 * @param radius An integer value
+		 * @param height An integer value
+		 */
+		public void computeVertices(int radius, int height){
+
+			// Going clockwise
+			// Left Topmost vertex 
+			vertex0X = (mousePointX - radius / 2);
+			vertex0Y = (mousePointY - height / 2);
+
+			// Right Topmost vertex
+			vertex1X = (mousePointX + radius / 2);
+			vertex1Y = (mousePointY - height / 2);
+
+			// Rightmost vertex 
+			vertex2X = (mousePointX + radius);
+			vertex2Y = mousePointY;
+
+			// Right Bottom vertex
+			vertex3X = (mousePointX + radius / 2);
+			vertex3Y = (mousePointY + height / 2);
+
+			// Left Bottom vertex 
+			vertex4X = (mousePointX - radius / 2);
+			vertex4Y = (mousePointY + height / 2);
+
+			// Leftmost vertex
+			vertex5X = (mousePointX - radius);
+			vertex5Y = mousePointY;
+		}
+
+
+		/**
+		 * This resets the y-coordinates of the hexagon column
+		 */
+		public void resetTempVertices(){
+
+			temp_vertex5Y = vertex5Y;
+			temp_vertex0Y = vertex0Y;
+			temp_vertex4Y = vertex4Y;
+			temp_vertex1Y = vertex1Y;
+			temp_vertex3Y = vertex3Y;
+			temp_vertex2Y = vertex2Y;
+		}
+
+
+		/**
+		 * This increments all the x-coordinates, to enable another columns to drawn alongside the already
+		 * drawn column
+		 * @param radius An integer value
+		 */
+		public void incrementX(int radius){
+
+			vertex5X += 3 * radius;
+			vertex0X += 3 * radius;
+			vertex4X += 3 * radius;
+			vertex1X += 3 * radius;
+			vertex3X += 3 * radius;
+			vertex2X += 3 * radius;
+
+		}
+
+		/**
+		 * Drawing method
+		 * @param g Graphics object
+		 */
+		public void paint(Graphics g){
+			int radius = getRadius();
+			System.out.println("Radius = " + radius);
+			
+			if (radius > 0){
+				height = Math.round(((float)(Math.sqrt(3) *radius)));
+				System.out.println("Height = " + height);
+
+				int nVert = numOfVerticalHexagons(radius);
+				int nHort = numOfHorizontalHexagons(radius);
+
+				computeVertices(radius, height);
+
+				for (int j = 0; j < nHort; j++){
+					resetTempVertices();
+
+					for (int i = 0; i < nVert; i++){
+			
+						// Draw northwest line
+						g.drawLine(vertex0X, temp_vertex0Y, vertex5X, temp_vertex5Y);
+
+						// Draw southwest line
+						g.drawLine(vertex5X, temp_vertex5Y, vertex4X, temp_vertex4Y);
+
+						// Draw top line
+						g.drawLine(vertex0X, temp_vertex0Y, vertex1X, temp_vertex1Y);
+						
+						// Draw northeast line
+						g.drawLine(vertex1X, temp_vertex1Y, vertex2X, temp_vertex2Y);
+
+						if (j != nHort - 1){ // remove the last drawn line
+							// Draw top of the next column
+							g.drawLine(vertex2X, temp_vertex2Y, vertex2X + radius, temp_vertex2Y);
+						}
+
+						// Draw southeast line
+						g.drawLine(vertex2X, temp_vertex2Y, vertex3X, temp_vertex3Y);
+
+						temp_vertex5Y += height;
+						temp_vertex0Y += height;
+						temp_vertex4Y += height;
+						temp_vertex1Y += height;
+						temp_vertex3Y += height;
+						temp_vertex2Y += height;
+					}
+					// Draw the last line(botton line) joining the bottom hexagons
+					g.drawLine(vertex0X, temp_vertex0Y, vertex1X, temp_vertex1Y);
+
+					incrementX(radius);
+
+				}
+			}
+		}
+
+
+		/**
+		 *  Returns the number of hexagons that can be fit in one column along the rectangle's height
+		 * @param  radius An integer value
+		 * @return count  An integer value
+		 */
+		public int numOfVerticalHexagons(int radius){
+			Dimension d = getSize();
+			int maxHeight = d.height - 1;
+			return maxHeight / (2 * radius);
+		}
+
+		/**
+		 * Returns the number of hexagons that can be fit in one row along the rectangle's width
+		 * @param  radius An integer value
+		 * @return count  An integer value
+		 */
+		public int numOfHorizontalHexagons(int radius){
+
+			// Two columns of hexagons make one unit
+			// Width of one hexagon = 2 x radius
+			// There is an overlap of (1/2) * radius between the two columns
+			Dimension d = getSize();
+			int maxWidth = d.width - 1;
+			if (maxWidth % 7 == 0){
+				return maxWidth / ((7 / 2) * radius);
+			}
+			else {
+				return (maxWidth -  1) / ((7 / 2) * radius);
+			}
+		}
+	}
+
+	public static void main(String[] args){
+		// Usage : java HexagonGrid
+		new HexagonGrid(40);	// Static value(change if desired)
+	}
+}</code></pre>
+    </noscript>
+</div>
+<p>Result on execution:</p>
+<p><img alt="Hexagon program execution" src="/images/hexagon_output.gif"/></p>
+<p>Something I might do in the future: </p>
+<ul>
+<li>Rewrite in javafx</li>
+<li>Make it coloured</li>
+<li>Add a pointy example.</li>
+</ul>
+<p><strong> Thanks!! </strong></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+
+
+
+          </div>
+
+            <div class="col-md-3">
+  <div class="well">
+
+    <p><abbr title="2016-09-09T16:27:00-05:00"><i class="fa fa-calendar"></i> Fri 09 September 2016</abbr></p>
+
+      <p><address><i class="fa fa-user"></i> By <a href="/author/okusanya-oluwadamilola.html" rel="author">Okusanya Oluwadamilola</a></address></p>
+
+    <hr/>
+
+      <p>
+              <a href="/category/fun.html" rel="tag"
+                  data-toggle="tooltip" class="label label-info"
+                  title="1 article in this category">Fun</a>
+            <a href="/tag/code.html" data-toggle="tooltip"
+      class="label label-default"
+      title="1 article with this tag">Code</a>
+      </p>
+      <hr/>
+
+
+
+  </div>
+              
+            </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- TODO: make footer sticky -->
+    <footer class="container-fluid">
+      <div class="container">
+        <div class="row">
+
+            <div class="col-md-2">
+                <h5>Social</h5>
+                <ul class="list-unstyled">
+                  <li>  <a href="#">
+      <i class="fa fa-external-link"></i>
+    You can add links in your config file
+  </a></li>
+                  <li>  <a href="#">
+      <i class="fa fa-external-link"></i>
+    Another social link
+  </a></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <h5>Links</h5>
+                <ul class="list-unstyled">
+                  <li>  <a href="http://getpelican.com/">
+      <img src="https://icons.better-idea.org/icon?url=getpelican.com&size=16" width="16" height="16" class="icon" alt="getpelican.com icon"/>
+    Pelican
+  </a></li>
+                  <li>  <a href="http://python.org/">
+      <img src="https://icons.better-idea.org/icon?url=python.org&size=16" width="16" height="16" class="icon" alt="python.org icon"/>
+    Python.org
+  </a></li>
+                  <li>  <a href="http://jinja.pocoo.org/">
+      <img src="https://icons.better-idea.org/icon?url=jinja.pocoo.org&size=16" width="16" height="16" class="icon" alt="jinja.pocoo.org icon"/>
+    Jinja2
+  </a></li>
+                  <li>  <a href="#">
+      <i class="fa fa-external-link"></i>
+    You can modify those links in your config file
+  </a></li>
+                </ul>
+            </div>
+
+          <div class="col-md-2">
+            <h5>Browse content by</h5>
+            <ul class="list-unstyled">
+
+            </ul>
+          </div>
+
+          <div class="col-md-2 text-muted">
+            <h5>Copyright notice</h5>
+            <p>© Copyright 2016 Okusanya Oluwadamilola.</p>
+          </div>
+
+          <div class="col-md-2 text-muted">
+            <h5>Disclaimer</h5>
+              <p>All opinions expressed in this site are my own personal opinions and are not endorsed by, nor do they represent the opinions of my previous, current and future employers or any of its affiliates, partners or customers.</p>
+          </div>
+
+          <div class="col-md-2">
+            <h5 class="pull-right"><a href="#"><i class="fa fa-arrow-up"></i> Back to top</a></h5>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="row col-md-12 text-muted text-center">
+          Site generated by <a href="http://getpelican.com"> Pelican</a>.<br/>
+          <a href="https://github.com/kdeldycke/plumage"> Plumage</a> theme by <a href="http://kevin.deldycke.com">Kevin Deldycke</a>.
+        </div>
+      </div>
+
+    </footer>
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.1.0/jquery.fitvids.min.js"></script>
+    <script src="/theme/js/jquery.mglass.js"></script>
+    <script src="/theme/js/application.js"></script>
+
+  </body>
+</html>
