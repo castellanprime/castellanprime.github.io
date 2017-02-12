@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Thoughts of a software developer journeyman</title><link href="http://castellanprime.github.io/" rel="alternate"></link><link href="http://castellanprime.github.io/feeds/other.atom.xml" rel="self"></link><id>http://castellanprime.github.io/</id><updated>2016-07-22T18:47:00-05:00</updated><entry><title>Making sense of the advice for programming newbies</title><link href="http://castellanprime.github.io/first-post.html" rel="alternate"></link><published>2016-07-22T18:47:00-05:00</published><author><name>Okusanya Oluwadamilola</name></author><id>tag:castellanprime.github.io,2016-07-22:first-post.html</id><summary type="html">&lt;/head&gt;&lt;body&gt;&lt;p&gt;There is some much choice to become a better programmer/developer. But all that advice can be distilled into
+these points:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Learn types of programming(imperative, declarative, dataflow, functional, procedural). &lt;/li&gt;
+&lt;li&gt;Practice on coding websites.&lt;/li&gt;
+&lt;li&gt;Pick up algorithmic books and coding (best-practices) books.&lt;/li&gt;
+&lt;li&gt;Search technical articles.&lt;/li&gt;
+&lt;li&gt;Get experience with side projects/internships/ community development in the form of 
+    open source software.
+From various sources(reddit, stackoverflow and so on)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;code&gt;Sometimes too much choice is no choice at all, a paradox&lt;/code&gt;.  &lt;/p&gt;
+&lt;p&gt;That said, how does one make use of the advice listed above:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Have passion. Going very far on this road to this less-than-great programmer place  is going to be a long one, meaning there are a lot of known unknowns and unknown unknowns on the journey. So if you do not have passion, you are going to hate every step of the way.&lt;/li&gt;
+&lt;li&gt;Make a schedule and stick to it.  I mean, stick to it. Think in long-term and short-term. Sometimes applying for jobs might get in the way, but make out time for them in your schedule.&lt;/li&gt;
+&lt;li&gt;Follow the advice listed above in the beginning part of the document in any order you like.&lt;/li&gt;
+&lt;li&gt;Code daily, in terms of hours or in terms of a goal(like shipping a function/tidying up documentation).Coding is like a muscle. It needs to worked on at regular intervals.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;That said, do I follow my own advice? I try to and fail, sometimes so miserably. After all, I am only human.&lt;/p&gt;
+&lt;p&gt;One of the ways I am trying to do follow it is by putting out this blog.The blog,     &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;imposes artifical deadlines on myself as I have to dedicate myself to push out content(show what I have learned) on a regular basis  &lt;/li&gt;
+&lt;li&gt;exposes my insecurities about my programming. Some of my code would be , for a lack of a better word , shitte.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Question of the day &lt;/strong&gt; : So what realizations have you come to today?   &lt;/p&gt;</summary><category term="Rants"></category></entry></feed>
