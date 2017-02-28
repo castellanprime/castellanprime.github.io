@@ -1,5 +1,427 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Thoughts of a software developer journeyman</title><link href="http://castellanprime.github.io/" rel="alternate"></link><link href="http://castellanprime.github.io/feeds/other.atom.xml" rel="self"></link><id>http://castellanprime.github.io/</id><updated>2016-07-22T18:47:00-05:00</updated><entry><title>Making sense of the advice for programming newbies</title><link href="http://castellanprime.github.io/first-post.html" rel="alternate"></link><published>2016-07-22T18:47:00-05:00</published><author><name>Okusanya Oluwadamilola</name></author><id>tag:castellanprime.github.io,2016-07-22:first-post.html</id><summary type="html">&lt;/head&gt;&lt;body&gt;&lt;p&gt;There is some much choice to become a better programmer/developer. But all that advice can be distilled into
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Thoughts of a software developer journeyman</title><link href="http://castellanprime.github.io/" rel="alternate"></link><link href="http://castellanprime.github.io/feeds/other.atom.xml" rel="self"></link><id>http://castellanprime.github.io/</id><updated>2017-02-27T20:13:00-06:00</updated><entry><title>Using the Linux bash shell</title><link href="http://castellanprime.github.io/using-the-Linux-bash-shell.html" rel="alternate"></link><published>2017-02-27T20:13:00-06:00</published><author><name>Okusanya Oluwadamilola</name></author><id>tag:castellanprime.github.io,2017-02-27:using-the-Linux-bash-shell.html</id><summary type="html">&lt;/head&gt;&lt;body&gt;&lt;p&gt;Man, it is been awhile. So the topic of bash shell scripting. Consider my problem:&lt;/p&gt;
+&lt;p&gt;I always download stuff to read later on. I am sort of a hoarder in that regard.(I hoard text files and pdfs). Anyways I have always used Nautils(Nautils is the GUI that gives the windows and that "Microsofty" look to Linux systems) to copy my downloaded files to the location I want them to go to. I desperately wanted to use the command line to automate that process. I recently contributed to a &lt;a href="http://www.zsh.org/"&gt;zsh&lt;/a&gt; theme called &lt;a href="https://github.com/frmendes/geometry/"&gt;Geometry&lt;/a&gt; which I use on my FreeBSD machine.(BTW, I think it is a fantastic beginner's project to contribute to, but I digress). &lt;/p&gt;
+&lt;p&gt;So the problem stated more formally is:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Automate the copying of recently downloaded files to user-defined directories. The user should have the option of specifing the number of files that they want to copy and if they want the copied file to have the same name as the original.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Whew!! That was a mouthful. Onto the task of coding up this badboy!!&lt;/p&gt;
+&lt;p&gt;Now what is the way this function would be called? I like the way &lt;code&gt;ls&lt;/code&gt; operates. U can either call &lt;code&gt;ls -l&lt;/code&gt;(ls long-format), &lt;code&gt;ls -r&lt;/code&gt;(list in reverse format) and &lt;code&gt;ls -l -r&lt;/code&gt;(ls long-format in reverse). These are called options. So this command, I am calling it &lt;strong&gt;cpRecent&lt;/strong&gt; , should have options for the number of files and an edit option. Ideally we want this new function to behave similarly to &lt;code&gt;cp&lt;/code&gt;. So the format could be &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;cpRecent -d {directories} -n {number of files} -i{interactive or edit mode} -h{help}&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The last option &lt;em&gt;-h&lt;/em&gt; is sort of mandatory as it makes the command in line with most of commands in linux and we want it that a new user can use the function upon reading the help menu, accessed through the &lt;em&gt;-h&lt;/em&gt; option. Also a "sort of" standard is to put your user-defined functions in the &lt;code&gt;bash_aliases&lt;/code&gt; file. Now, lets see the help menu(encapsulated by our &lt;code&gt;__usage()&lt;/code&gt; function):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;__usage(){
+
+cat &amp;lt;&amp;lt;End-Of-Message
+_______________________________________________________________________________
+Copies/Moves the n most recent file(s) in a directory to another directory where
+n is user specified.
+
+&amp;lt;cpRecent/mvRecent&amp;gt; [-d "D1,D2"] [-n NUM] [-ih]
+
+    -d "D1,D2"  The directory that is copied/moved from is D1 while  
+                the directory that is copied/moved to is D2 
+                The directories would need to be in relative paths
+    -n          This specifies an integer num of files 
+    -i          This allows the user to edit the name of the file
+                to be copied or moved   
+    -h          Shows this entire wall of text
+
+An example of how to use the command:
+
+cpRecent -d "Documents,." -n 3
+
+(This means that copy the three(3) most recent files in Documents to 
+the folder I am currently in)
+_______________________________________________________________________________
+End-Of-Message
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The above is called a &lt;em&gt;here document&lt;/em&gt;. It allows for self-documenting code and we can use it to store our help menu. Important caveats:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The string on the last line must not have any spaces in front of it.&lt;/p&gt;
+&lt;p&gt;Dont use &lt;code&gt;wall&lt;/code&gt;. &lt;code&gt;Wall&lt;/code&gt; sends the message to all the users logged into the system. Ideally you want the message to go to the current user executing the script.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;If you noticed, the usage function has preceding double underscores. That is "sort of" a &lt;a href="http://stackoverflow.com/questions/13797087/bash-why-double-underline-for-private-functions-why-for-bash-complet"&gt;convention&lt;/a&gt;. How do we process these options &lt;strong&gt;-d, -n, -i, -h&lt;/strong&gt;? We use a shell command called &lt;code&gt;getopts&lt;/code&gt;. Another caveat: &lt;code&gt;getopts&lt;/code&gt; only processes short options( just one dash infront of the character). Long options are more descriptive like &lt;em&gt;--number instead of -n&lt;/em&gt; in our description. There is a way to do &lt;a href="http://mywiki.wooledge.org/BashFAQ/035"&gt;that&lt;/a&gt; but I am too lazy.  We also are going to put all our option processing into another function.  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;__processoptions(){
+    OPTIND=1
+    while getopts ":d:n:ih" opt; do
+        case &lt;span class="nv"&gt;$opt&lt;/span&gt; in 
+            d ) IFS=',' read -r -a directories &lt;span class="err"&gt;&amp;lt;&amp;lt;&amp;lt;&lt;/span&gt; "&lt;span class="nv"&gt;$OPTARG&lt;/span&gt;";; 
+            n ) numfiles=&lt;span class="nv"&gt;$OPTARG&lt;/span&gt;;;
+            i ) interactive=1;;
+            h ) __usage; return 1;;
+            \? ) echo "&lt;span class="nv"&gt;$invalid_option&lt;/span&gt; -&lt;span class="nv"&gt;$OPTARG&lt;/span&gt;" &amp;gt;&lt;span class="err"&gt;&amp;amp;&lt;/span&gt;2 ; return 1;;
+            : ) echo "&lt;span class="nv"&gt;$no_args&lt;/span&gt;"; __usage &amp;gt;&lt;span class="err"&gt;&amp;amp;&lt;/span&gt;2 ; return 1;;
+            * ) __usage &amp;gt;&lt;span class="ni"&gt;&amp;amp;2;&lt;/span&gt; return 1;;
+        esac
+    done    
+    shift "$((OPTIND-1))"
+
+    # Check for errors  
+    (( &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="c1"&gt;#directories[@]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt; != 2 )) &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; echo "&lt;span class="nv"&gt;$invalid_option&lt;/span&gt; Number of directories must be 2" &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; return 2
+
+    __returnfullpath "&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"
+    directories[0]="&lt;span class="nv"&gt;$fullpath&lt;/span&gt;"
+    __returnfullpath "&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"
+    directories[1]="&lt;span class="nv"&gt;$fullpath&lt;/span&gt;"
+
+    if [[ -z &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt; || -z &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt; ]]; then
+        echo &lt;span class="nv"&gt;$no_directory&lt;/span&gt; 
+        return 3
+    fi
+
+    [[ numfiles != *[!0-9]* ]] &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; echo "&lt;span class="nv"&gt;$invalid_option&lt;/span&gt; Number of files cannot be a string" &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; return 4
+
+    (( &lt;span class="nv"&gt;$numfiles&lt;/span&gt; == 0 )) &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; echo "&lt;span class="nv"&gt;$invalid_option&lt;/span&gt; Number of files cannot be zero" &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; return 4
+
+    return 0
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;(( ))&lt;/code&gt; indicate mathematical evaluation while &lt;code&gt;[[ ]]&lt;/code&gt; is for &lt;code&gt;test&lt;/code&gt;(conditional expressions). &lt;strong&gt;A fun way to check all the conditional expressions that is there is to do this on your command line &lt;code&gt;man test&lt;/code&gt;&lt;/strong&gt; .&lt;code&gt;&amp;gt;&amp;amp;2&lt;/code&gt; is a way to print to &lt;code&gt;sterr&lt;/code&gt; instead of &lt;code&gt;stout&lt;/code&gt;. We use &lt;code&gt;return&lt;/code&gt; instead of &lt;code&gt;exit&lt;/code&gt; because we are going to put this code in &lt;code&gt;bash_aliases&lt;/code&gt; file. An &lt;code&gt;exit&lt;/code&gt; commad would cause our current shell to terminated prematurely. The line &lt;code&gt;IFS=',' read -r -a directories &amp;lt;&amp;lt;&amp;lt; "$OPTARG";;&lt;/code&gt; is to split the string from &lt;code&gt;OPTARG&lt;/code&gt; into two substrings at any &lt;code&gt;,&lt;/code&gt;. &lt;code&gt;IFS&lt;/code&gt; is kinda of global and we do not want to set it so we put it on the same line as the &lt;code&gt;read&lt;/code&gt; command . This part &lt;code&gt;read -r -a directories &amp;lt;&amp;lt;&amp;lt; "$OPTARG"&lt;/code&gt; is just redirecting the string into an array called &lt;strong&gt;directories&lt;/strong&gt;. &lt;/p&gt;
+&lt;p&gt;So we get an invocation of the command like: &lt;code&gt;cpRecent -d "Downloads,." -n 2&lt;/code&gt;. We need to check that the user has inputted directories that are on the system. (I mean, you can't copy from thin air into thin air). That is the function of the &lt;code&gt;__returnfullpath&lt;/code&gt; function as shown below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Advise that you use relative paths
+__returnfullpath(){
+    local npath
+    if [[ -d $1 ]]; then
+        cd "$(dirname $1)"
+        npath="&lt;span class="nv"&gt;$PWD&lt;/span&gt;/$(basename $1)"
+        npath="&lt;span class="nv"&gt;$npath&lt;/span&gt;/"         # Add a slash
+        npath="&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;npath&lt;/span&gt;&lt;span class="o"&gt;%.*&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"     # Delete . 
+    fi
+    fullpath=&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;npath&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;""&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;local variable&lt;/code&gt; basically makes &lt;code&gt;variable&lt;/code&gt; to have &lt;em&gt;function-scope&lt;/em&gt;, that is, &lt;code&gt;variable&lt;/code&gt; only lives in a function. &lt;code&gt;dirname&lt;/code&gt; basically gets the parent directory of our directory and &lt;code&gt;basename&lt;/code&gt; returns a filename from a path.  &lt;/p&gt;
+&lt;p&gt;The other variables that we are going to be using is shown below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#Error codes
+no_args="You need to pass in an argument"
+invalid_option="Invaild option:"
+no_directory="No directory found"
+
+# Return values 
+fullpath=
+directories=
+numfiles=
+interactive=
+
+typeset -a files
+typeset -A filelist
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;typeset&lt;/code&gt; is a way to declare a variable as an array. &lt;code&gt;typeset -A&lt;/code&gt; initialises an associative array, kinda like a dictionary and &lt;code&gt;typeset -a&lt;/code&gt; initialises an normal array. &lt;/p&gt;
+&lt;p&gt;Continuing with our eariler example, we have to get the 2 most recent files from the &lt;em&gt;Downloads&lt;/em&gt; directory. We do that with another function:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;__getrecentfiles(){
+
+    local num="-"&lt;span class="nv"&gt;$numfiles&lt;/span&gt;""
+
+    # Get the requested files in directory(skips directories)
+    if [[ -n "$(ls -t &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt; | head &lt;span class="nv"&gt;$num&lt;/span&gt;)" ]]; then
+        # For some reason using local -a or declare -a does not seem to split the string into two
+        local tempfiles=($(ls -t &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt; | head &lt;span class="nv"&gt;$num&lt;/span&gt;))
+        for index in "&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="err"&gt;!&lt;/span&gt;&lt;span class="n"&gt;tempfiles&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"; do
+            echo &lt;span class="nv"&gt;$index&lt;/span&gt; &lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;tempfiles&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;
+            [[ -f "&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}${&lt;/span&gt;&lt;span class="n"&gt;tempfiles&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;" ]] &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; files+=("&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;tempfiles&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;") 
+        done
+    fi
+
+    return 0
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Basically, we make use of &lt;code&gt;ls -t&lt;/code&gt;(ls with timestamps arranged from most recent to least recent) and &lt;code&gt;head&lt;/code&gt; to get the list of files. Then we check if the files themselves are directories with the &lt;code&gt;-f&lt;/code&gt; test. If they are, we add them to &lt;em&gt;files&lt;/em&gt; array. Okay, we need to do one last thing, we need to get the full path of the files so that &lt;code&gt;cp&lt;/code&gt; would not complain!!  We use the &lt;em&gt;__processlines&lt;/em&gt; function to do that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;__processlines(){
+    local name
+    local answer
+    if [[ -n &lt;span class="nv"&gt;$interactive&lt;/span&gt; ]]; then
+        for index in "&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="err"&gt;!&lt;/span&gt;&lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"; do
+            name=&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;
+            read -n 1 -p "Old name: &lt;span class="nv"&gt;$name.&lt;/span&gt; Do you wish to change the name(y/n)?" answer
+            # Need to leave a space in between the variables 
+            [[ "&lt;span class="nv"&gt;$answer&lt;/span&gt;" == "y" ]] &lt;span class="err"&gt;&amp;amp;&amp;amp;&lt;/span&gt; read -p "Enter new name:" name
+            local dirFrom="&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}${&lt;/span&gt;&lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"
+            local dirTo="&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;&lt;span class="nv"&gt;$name&lt;/span&gt;"
+            filelist+=(["&lt;span class="nv"&gt;$dirFrom&lt;/span&gt;"]="&lt;span class="nv"&gt;$dirTo&lt;/span&gt;")
+        done
+    else                                    
+        for index in "&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="err"&gt;!&lt;/span&gt;&lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"; do
+            local dirFrom="&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}${&lt;/span&gt;&lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"
+            local dirTo="&lt;span class="cp"&gt;${&lt;/span&gt;&lt;span class="n"&gt;directories&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}${&lt;/span&gt;&lt;span class="n"&gt;files&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="cp"&gt;}&lt;/span&gt;"
+            filelist+=(["&lt;span class="nv"&gt;$dirFrom&lt;/span&gt;"]="&lt;span class="nv"&gt;$dirTo&lt;/span&gt;")
+        done    
+    fi
+
+    return 0
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We check for the interactive option (&lt;em&gt;-i&lt;/em&gt;). If the user specified interactive, we ask if they want to keep the names or change them using these lines:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;read -n 1 -p "Old name: $name. Do you wish to change the name(y/n)?" answer&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This line prompts the user with the old name of the file and asks the user if he/she wants to change it. The &lt;code&gt;read&lt;/code&gt; command is a way to read user input and in this case, it only reads one character, either a "y" or a "n".&lt;code&gt;-n&lt;/code&gt; means "number of characters" and &lt;code&gt;-p&lt;/code&gt; is for prompt. The value is stored in answer:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[[ "$answer" == "y" ]] &amp;amp;&amp;amp; read -p "Enter new name:" name&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This line checks if the answer is "y". If it is, it asks for the new name. We then associate the old name of the file with the new name of the file: &lt;code&gt;filelist+=(["$dirFrom"]="$dirTo")&lt;/code&gt;.  Now I had run all this in one script file , but because I did not want to pollute my &lt;code&gt;bash_aliases&lt;/code&gt; file, I decided to put all the above code into a helper library: &lt;em&gt;helperlib.sh&lt;/em&gt;(Imaginative, huh?) So where do we use this helperlib.sh? We get to use it in the main function, &lt;strong&gt;cpRecent&lt;/strong&gt;. Another reason for using the library was to see if I could also use the code to do a &lt;code&gt;mv&lt;/code&gt;(move command) style command. Turns out I could. Okay, enough stalling. Here is the main &lt;code&gt;bash_aliases&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/d2740d54db7c13cd88b0bb1cbb8f8198.js'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+* @license: 
+* The MIT License (MIT)
+*
+* Copyright (c) 2017 David Okusanya
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*
+* 
+* 
+*
+*/
+
+#!/bin/bash
+# Aliases file
+
+cpRecent(){
+	. ~/.helperlib.sh
+	__processoptions $@
+	if (( $? == 0 ));then
+		__getrecentfiles
+		__processlines
+		local numOfCopiedFiles=0
+		for line in "${!filelist[@]}"; do
+			cp $line ${filelist[$line]}
+			(( ++numOfCopiedFiles ))
+		done
+		echo "You have copied $numOfCopiedFiles file(s)"
+		unset files
+		unset filelist
+	fi
+	return
+}
+
+mvRecent(){
+	. ~/.helperlib.sh
+	__processoptions $@
+	if (( $? == 0 )); then
+		__getrecentFiles
+		__processlines
+		local numOfMovedFiles=0
+		for line in "${!filelist[@]}"; do
+			mv $line ${filelist[$line]}
+			(( ++numOfMovedFiles ))
+		done
+		echo "You have copied $numOfMovedFiles files"
+		unset files
+		unset filelist
+	fi	
+	return
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;p&gt;The first line in the &lt;strong&gt;cpRecent&lt;/strong&gt; command is to &lt;em&gt;source&lt;/em&gt; the helperlib.sh. If you have used Java with its &lt;code&gt;import&lt;/code&gt; statement or C++ with its &lt;code&gt;include&lt;/code&gt; statement, it bascially does the same thing. Another thing with &lt;code&gt;return&lt;/code&gt; and &lt;code&gt;exit&lt;/code&gt;,it normally returns the status of the last command. The status of the last command is in the variable &lt;code&gt;$?&lt;/code&gt;. If the status is &lt;code&gt;0&lt;/code&gt;, then we know that the command was successful. Any other number indicates a failure and that is what this &lt;code&gt;(( $? == 0 ))&lt;/code&gt; is checking. &lt;code&gt;unset&lt;/code&gt; is normally used with arrays to deference(delete) them. So the helperlib.sh is shown below:&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/5aff1a8f6b49d4402c46f23720e36295.js'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;/**
+* @license: 
+* The MIT License (MIT)
+*
+* Copyright (c) 2017 David Okusanya
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*
+* 
+* 
+*
+*/
+
+#!/bin/bash
+# File: helperlib.sh 
+# Brief: Library for cpRecent, mvRecent commands
+
+# Error codes
+no_args="You need to pass in an argument"
+invalid_option="Invaild option:"
+no_directory="No directory found"
+
+# Return values 
+fullpath=
+directories=
+numfiles=
+interactive=
+
+typeset -a files
+typeset -A filelist
+
+# Advise that you use relative paths
+__returnfullpath(){
+	local npath
+	if [[ -d $1 ]]; then
+		cd "$(dirname $1)"
+		npath="$PWD/$(basename $1)"
+		npath="$npath/"			#Add a slash
+		npath="${npath%.*}"		#Delete . 
+	fi
+	fullpath=${npath:=""}
+}
+
+__usage(){
+
+cat &lt;&lt;End-Of-Message
+_______________________________________________________________________________
+Copies/Moves the n most recent file(s) in a directory to another directory where
+n is user specified. 
+
+&lt;cpRecent/mvRecent&gt; [-d "D1,D2"] [-n NUM] [-ih]
+
+	-d "D1,D2"	The directory that is copied/moved from is D1 while  
+			the directory that is copied/moved to is D2 
+			The directories would need to be in relative paths
+	-n 		This specifies an integer num of files 
+	-i		This allows the user to edit the name of the file
+			to be copied or moved 	
+	-h		Shows this entire wall of text 		
+			
+An example of how to use the command:
+	
+	cpRecent -d "Documents,." -n 3
+	
+	(This means that copy the three(3) most recent files in Documents to 
+	the folder I am currently in)
+_______________________________________________________________________________
+End-Of-Message
+}
+
+
+__processoptions(){
+	OPTIND=1
+	while getopts ":d:n:ih" opt; do
+		case $opt in 
+			d ) IFS=',' read -r -a directories &lt;&lt;&lt; "$OPTARG";; 
+			n ) numfiles=$OPTARG;;
+			i ) interactive=1;;
+			h ) __usage; return 1;;
+			\? ) echo "$invalid_option -$OPTARG" &gt;&amp;2 ; return 1;;
+			: ) echo "$no_args"; __usage &gt;&amp;2 ; return 1;;
+			* ) __usage &gt;&amp;2; return 1;;
+		esac
+	done	
+	shift "$((OPTIND-1))"
+
+	# Check for errors	
+	(( ${#directories[@]} != 2 )) &amp;&amp; echo "$invalid_option Number of directories must be 2" &amp;&amp; return 2
+	
+	__returnfullpath "${directories[0]}"
+	directories[0]="$fullpath"
+	__returnfullpath "${directories[1]}"
+	directories[1]="$fullpath"	
+
+	if [[ -z ${directories[0]} || -z ${directories[1]} ]]; then
+		echo $no_directory 
+		return 3
+	fi
+
+	[[ numfiles != *[!0-9]* ]] &amp;&amp; echo "$invalid_option Number of files cannot be a string" &amp;&amp; return 4
+
+	(( $numfiles == 0 )) &amp;&amp; echo "$invalid_option Number of files cannot be zero" &amp;&amp; return 4
+
+	return 0
+}
+
+
+__getrecentfiles(){
+	
+	local num="-"$numfiles""
+	
+	# Get the requested files in directory(skips directories)
+	if [[ -n "$(ls -t ${directories[0]} | head $num)" ]]; then
+		# For some reason using local -a or declare -a does not seem to split the string into two
+		local tempfiles=($(ls -t ${directories[0]} | head $num))
+		for index in "${!tempfiles[@]}"; do
+			echo $index ${tempfiles[index]}
+			[[ -f "${directories[0]}${tempfiles[index]}" ]] &amp;&amp; files+=("${tempfiles[index]}") 
+		done
+	fi
+
+	return 0
+}
+
+__processlines(){
+	local name
+	local answer
+	if [[ -n $interactive ]]; then
+		for index in "${!files[@]}"; do
+			name=${files[index]}
+			read -n 1 -p "Old name: $name. Do you wish to change the name(y/n)?" answer
+			# Need to leave a space in between the variables 
+			echo
+			[[ "$answer" == "y" ]] &amp;&amp; read -p "Enter new name:" name
+			local dirFrom="${directories[0]}${files[index]}"
+			local dirTo="${directories[1]}$name"
+			filelist+=(["$dirFrom"]="$dirTo")
+		done
+	else									
+		for index in "${!files[@]}"; do
+			local dirFrom="${directories[0]}${files[index]}"
+			local dirTo="${directories[1]}${files[index]}"
+			filelist+=(["$dirFrom"]="$dirTo")
+		done	
+	fi
+
+	return 0
+}
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;p&gt;Okay, I learnt a lot of patience while coding up this solution. Also &lt;code&gt;bash -x&lt;/code&gt; is a powerful way of looking at how your bash program executes, basically debugging. Use it liberally!!!!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;One caveats&lt;/strong&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Presently the directories should be relative paths. I have not found a way to get the path of any file with using some third party library. &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;To see it in action, &lt;/p&gt;
+&lt;p&gt;&lt;img alt="Bash program execution" src="http://castellanprime.github.io/images/bash_command_output.gif"/&gt;&lt;/p&gt;</summary><category term="Code"></category></entry><entry><title>Making sense of the advice for programming newbies</title><link href="http://castellanprime.github.io/first-post.html" rel="alternate"></link><published>2016-07-22T18:47:00-05:00</published><author><name>Okusanya Oluwadamilola</name></author><id>tag:castellanprime.github.io,2016-07-22:first-post.html</id><summary type="html">&lt;/head&gt;&lt;body&gt;&lt;p&gt;There is some much choice to become a better programmer/developer. But all that advice can be distilled into
 these points:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;ul&gt;
